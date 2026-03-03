@@ -13,7 +13,7 @@ public class Vinyl {
     private Integer releaseYear;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = true) // foreign key pointing to User
+    @JoinColumn(name = "user_id", nullable = false) // foreign key pointing to User
     private User user;
 
     //Getters and setters
