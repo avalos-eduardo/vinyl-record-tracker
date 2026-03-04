@@ -1,52 +1,43 @@
 package com.example.vinyl_record_collection_tracker.controllers;
 
 import com.example.vinyl_record_collection_tracker.models.User;
-import com.example.vinyl_record_collection_tracker.models.Vinyl;
-import com.example.vinyl_record_collection_tracker.repositories.UserRepository;
-import org.springframework.http.HttpStatus;
+import com.example.vinyl_record_collection_tracker.services.UserService;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final UserRepository userRepository;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
-    public List<User> getAllUsers(){
-        return userRepository.findAll();
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id){
-        return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+    public User getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user){
-        return userRepository.save(user);
+    public User createUser(@RequestBody User user) {
+        return userService.createUser(user);
     }
 
     @PutMapping("/{id}")
     public User updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
-
-        user.setUsername(updatedUser.getUsername());
-        user.setEmail(updatedUser.getEmail());
-        user.setPassword(updatedUser.getPassword());
-
-        return userRepository.save(user);
+        return userService.updateUser(id, updatedUser);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id){
-        userRepository.deleteById(id);
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
     }
-
 }
