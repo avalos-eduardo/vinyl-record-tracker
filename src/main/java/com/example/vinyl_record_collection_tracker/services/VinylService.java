@@ -1,5 +1,7 @@
 package com.example.vinyl_record_collection_tracker.services;
 
+import com.example.vinyl_record_collection_tracker.dtos.VinylRequestDTO;
+import com.example.vinyl_record_collection_tracker.dtos.VinylResponseDTO;
 import com.example.vinyl_record_collection_tracker.models.User;
 import com.example.vinyl_record_collection_tracker.models.Vinyl;
 import com.example.vinyl_record_collection_tracker.repositories.UserRepository;
@@ -21,35 +23,52 @@ public class VinylService {
         this.userRepository = userRepository;
     }
 
-    public List<Vinyl> getAllVinyls() {
-        return vinylRepository.findAll();
+    private VinylResponseDTO toDTO(Vinyl vinyl) {
+        return new VinylResponseDTO(
+                vinyl.getId(),
+                vinyl.getTitle(),
+                vinyl.getArtist(),
+                vinyl.getReleaseYear(),
+                vinyl.getUser().getId()
+        );
     }
 
-    public Vinyl getVinylById(Long id) {
-        return vinylRepository.findById(id)
+    public List<VinylResponseDTO> getAllVinyls() {
+        return vinylRepository.findAll().stream().map(this::toDTO).toList();
+    }
+
+    public VinylResponseDTO getVinylById(Long id) {
+        Vinyl vinyl = vinylRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vinyl not found."));
+        return toDTO(vinyl);
     }
 
-    public List<Vinyl> getVinylsByUserId(Long userId) {
-        return vinylRepository.findByUserId(userId);
+    public List<VinylResponseDTO> getVinylsByUserId(Long userId) {
+        return vinylRepository.findByUserId(userId).stream().map(this::toDTO).toList();
     }
 
-    public Vinyl createVinyl(Vinyl vinyl, Long userId) {
+    public VinylResponseDTO createVinyl(VinylRequestDTO dto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+
+        Vinyl vinyl = new Vinyl();
+        vinyl.setTitle(dto.getTitle());
+        vinyl.setArtist(dto.getArtist());
+        vinyl.setReleaseYear(dto.getReleaseYear());
         vinyl.setUser(user);
-        return vinylRepository.save(vinyl);
+
+        return toDTO(vinylRepository.save(vinyl));
     }
 
-    public Vinyl updateVinyl(Long id, Vinyl updatedVinyl) {
+    public VinylResponseDTO updateVinyl(Long id, VinylRequestDTO dto) {
         Vinyl vinyl = vinylRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vinyl not found."));
 
-        vinyl.setTitle(updatedVinyl.getTitle());
-        vinyl.setArtist(updatedVinyl.getArtist());
-        vinyl.setReleaseYear(updatedVinyl.getReleaseYear());
+        vinyl.setTitle(dto.getTitle());
+        vinyl.setArtist(dto.getArtist());
+        vinyl.setReleaseYear(dto.getReleaseYear());
 
-        return vinylRepository.save(vinyl);
+        return toDTO(vinylRepository.save(vinyl));
     }
 
     public void deleteVinyl(Long id) {

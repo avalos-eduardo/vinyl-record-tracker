@@ -1,5 +1,7 @@
 package com.example.vinyl_record_collection_tracker.services;
 
+import com.example.vinyl_record_collection_tracker.dtos.UserRequestDTO;
+import com.example.vinyl_record_collection_tracker.dtos.UserResponseDTO;
 import com.example.vinyl_record_collection_tracker.models.User;
 import com.example.vinyl_record_collection_tracker.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -17,28 +19,39 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    private UserResponseDTO toDTO(User user) {
+        return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail());
     }
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    public UserResponseDTO getUserById(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+        return toDTO(user);
     }
 
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public UserResponseDTO createUser(UserRequestDTO dto) {
+        User user = new User();
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword()); // will be hashed once auth is added
+        return toDTO(userRepository.save(user));
     }
 
-    public User updateUser(Long id, User updatedUser) {
+    public UserResponseDTO updateUser(Long id, UserRequestDTO dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
 
-        user.setUsername(updatedUser.getUsername());
-        user.setEmail(updatedUser.getEmail());
-        user.setPassword(updatedUser.getPassword());
-
-        return userRepository.save(user);
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword()); // will be hashed once auth is added
+        return toDTO(userRepository.save(user));
     }
 
     public void deleteUser(Long id) {

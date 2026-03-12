@@ -1,5 +1,7 @@
 package com.example.vinyl_record_collection_tracker.controllers;
 
+import com.example.vinyl_record_collection_tracker.dtos.UserRequestDTO;
+import com.example.vinyl_record_collection_tracker.dtos.UserResponseDTO;
 import com.example.vinyl_record_collection_tracker.models.User;
 import com.example.vinyl_record_collection_tracker.services.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -17,23 +19,23 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<UserResponseDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
+    public UserResponseDTO getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    public UserResponseDTO createUser(@RequestBody UserRequestDTO dto) {
+        return userService.createUser(dto);
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        return userService.updateUser(id, updatedUser);
+    public UserResponseDTO updateUser(@PathVariable Long id, @RequestBody UserRequestDTO dto) {
+        return userService.updateUser(id, dto);
     }
 
     @DeleteMapping("/{id}")

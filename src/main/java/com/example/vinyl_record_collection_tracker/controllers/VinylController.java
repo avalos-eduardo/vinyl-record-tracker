@@ -1,6 +1,7 @@
 package com.example.vinyl_record_collection_tracker.controllers;
 
-import com.example.vinyl_record_collection_tracker.models.Vinyl;
+import com.example.vinyl_record_collection_tracker.dtos.VinylRequestDTO;
+import com.example.vinyl_record_collection_tracker.dtos.VinylResponseDTO;
 import com.example.vinyl_record_collection_tracker.services.VinylService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,28 +18,28 @@ public class VinylController {
     }
 
     @GetMapping
-    public List<Vinyl> getAllVinyls() {
+    public List<VinylResponseDTO> getAllVinyls() {
         return vinylService.getAllVinyls();
     }
 
     @GetMapping("/{id}")
-    public Vinyl getVinyl(@PathVariable Long id) {
+    public VinylResponseDTO getVinyl(@PathVariable Long id) {
         return vinylService.getVinylById(id);
     }
 
     @GetMapping("/user/{userId}")
-    public List<Vinyl> getVinylsByUser(@PathVariable Long userId) {
+    public List<VinylResponseDTO> getVinylsByUser(@PathVariable Long userId) {
         return vinylService.getVinylsByUserId(userId);
     }
 
     @PostMapping
-    public Vinyl createVinyl(@RequestBody Vinyl vinyl, @RequestParam Long userId) {
-        return vinylService.createVinyl(vinyl, userId);
+    public VinylResponseDTO createVinyl(@RequestBody VinylRequestDTO dto, @RequestParam Long userId) {
+        return vinylService.createVinyl(dto, userId);
     }
 
     @PutMapping("/{id}")
-    public Vinyl updateVinyl(@PathVariable Long id, @RequestBody Vinyl updatedVinyl) {
-        return vinylService.updateVinyl(id, updatedVinyl);
+    public VinylResponseDTO updateVinyl(@PathVariable Long id, @RequestBody VinylRequestDTO dto) {
+        return vinylService.updateVinyl(id, dto);
     }
 
     @DeleteMapping("/{id}")
