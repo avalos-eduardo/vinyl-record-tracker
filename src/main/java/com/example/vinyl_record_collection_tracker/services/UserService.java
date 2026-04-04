@@ -23,7 +23,7 @@ public class UserService {
     }
 
     private UserResponseDTO toDTO(User user) {
-        return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail());
+        return new UserResponseDTO(user.getId(), user.getActualUsername(), user.getEmail());
     }
 
     public List<UserResponseDTO> getAllUsers() {
