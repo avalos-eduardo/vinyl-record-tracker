@@ -15,7 +15,7 @@ public class User {
     private String username;
     private String email;
     @JsonIgnore
-    private String password; //plans to hash later for more security
+    private String password;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

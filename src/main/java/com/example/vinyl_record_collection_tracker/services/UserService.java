@@ -5,6 +5,7 @@ import com.example.vinyl_record_collection_tracker.dtos.UserResponseDTO;
 import com.example.vinyl_record_collection_tracker.models.User;
 import com.example.vinyl_record_collection_tracker.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -14,9 +15,11 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private UserResponseDTO toDTO(User user) {
@@ -40,7 +43,7 @@ public class UserService {
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword()); // will be hashed once auth is added
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         return toDTO(userRepository.save(user));
     }
 
@@ -50,7 +53,7 @@ public class UserService {
 
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword()); // will be hashed once auth is added
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         return toDTO(userRepository.save(user));
     }
 
