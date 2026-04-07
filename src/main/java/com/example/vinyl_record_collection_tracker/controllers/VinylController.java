@@ -33,8 +33,8 @@ public class VinylController {
     }
 
     @PostMapping
-    public VinylResponseDTO createVinyl(@RequestBody VinylRequestDTO dto, @RequestParam Long userId) {
-        return vinylService.createVinyl(dto, userId);
+    public VinylResponseDTO createVinyl(@RequestBody VinylRequestDTO dto) {
+        return vinylService.createVinyl(dto);
     }
 
     @PutMapping("/{id}")
