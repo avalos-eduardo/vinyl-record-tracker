@@ -15,7 +15,8 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
+    @Column(name = "username")
+    private String actualUsername;
     private String email;
     @JsonIgnore
     private String password;
@@ -29,8 +30,8 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() { return email; }
-    public String getActualUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getActualUsername() { return actualUsername; }
+    public void setActualUsername(String actualUsername) { this.actualUsername= actualUsername; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
