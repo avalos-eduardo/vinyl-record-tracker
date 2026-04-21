@@ -50,7 +50,7 @@ public class UserService {
 
     public UserResponseDTO createUser(UserRequestDTO dto) {
         User user = new User();
-        user.setUsername(dto.getUsername());
+        user.setActualUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         return toDTO(userRepository.save(user));
@@ -66,7 +66,7 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
 
-        user.setUsername(dto.getUsername());
+        user.setActualUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         return toDTO(userRepository.save(user));
