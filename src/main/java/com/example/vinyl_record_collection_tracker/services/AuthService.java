@@ -7,6 +7,7 @@ import com.example.vinyl_record_collection_tracker.models.User;
 import com.example.vinyl_record_collection_tracker.repositories.PasswordResetTokenRepository;
 import com.example.vinyl_record_collection_tracker.repositories.UserRepository;
 import com.example.vinyl_record_collection_tracker.security.JwtUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -69,6 +70,7 @@ public class AuthService {
         emailService.sendPasswordResetEmail(email, token);
     }
 
+    @Transactional
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired reset token."));
 
@@ -84,7 +86,6 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        resetToken.setUsed(true);
-        passwordResetTokenRepository.save(resetToken);
+        passwordResetTokenRepository.deleteAllByUser(user);
     }
 }
