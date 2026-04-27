@@ -26,7 +26,7 @@ public class DataSeeder implements ApplicationRunner {
         User demo = userRepository.findByEmail("demo@vinyltracker.com");
         if (demo == null) {
             demo = new User();
-            demo.setActualUsername("Demo User");
+            demo.setName("Demo User");
             demo.setEmail("demo@vinyltracker.com");
             demo.setPassword(passwordEncoder.encode("demo123"));
             userRepository.save(demo);

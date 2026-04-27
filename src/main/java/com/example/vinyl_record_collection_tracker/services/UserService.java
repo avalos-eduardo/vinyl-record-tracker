@@ -26,7 +26,7 @@ public class UserService {
     }
 
     private UserResponseDTO toDTO(User user) {
-        return new UserResponseDTO(user.getId(), user.getActualUsername(), user.getEmail());
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail());
     }
 
     public List<UserResponseDTO> getAllUsers() {
@@ -49,8 +49,12 @@ public class UserService {
     }
 
     public UserResponseDTO createUser(UserRequestDTO dto) {
+        if (userRepository.findByEmail(dto.getEmail()) != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "An account with this email already exists.");
+        }
+
         User user = new User();
-        user.setActualUsername(dto.getUsername());
+        user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         return toDTO(userRepository.save(user));
@@ -66,7 +70,7 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
 
-        user.setActualUsername(dto.getUsername());
+        user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         return toDTO(userRepository.save(user));
