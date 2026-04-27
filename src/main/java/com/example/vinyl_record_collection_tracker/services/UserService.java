@@ -53,6 +53,10 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "An account with this email already exists.");
         }
 
+        if (dto.getPassword().length() < 8 ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 8 characters long.");
+        }
+
         User user = new User();
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
