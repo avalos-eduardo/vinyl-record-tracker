@@ -5,6 +5,7 @@ import com.example.vinyl_record_collection_tracker.dtos.ForgotPasswordRequestDTO
 import com.example.vinyl_record_collection_tracker.dtos.LoginRequestDTO;
 import com.example.vinyl_record_collection_tracker.dtos.ResetPasswordRequestDTO;
 import com.example.vinyl_record_collection_tracker.services.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +19,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public AuthResponseDTO login(@RequestBody LoginRequestDTO dto) {
-        return authService.login(dto);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void login(@RequestBody LoginRequestDTO dto, HttpServletResponse response) {
+        authService.login(dto, response);
+    }
+
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(HttpServletResponse response) {
+        authService.logout(response);
     }
 
     @PostMapping("/forgot-password")

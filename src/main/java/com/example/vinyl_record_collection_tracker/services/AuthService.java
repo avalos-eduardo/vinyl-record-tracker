@@ -7,6 +7,8 @@ import com.example.vinyl_record_collection_tracker.models.User;
 import com.example.vinyl_record_collection_tracker.repositories.PasswordResetTokenRepository;
 import com.example.vinyl_record_collection_tracker.repositories.UserRepository;
 import com.example.vinyl_record_collection_tracker.security.JwtUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,7 +40,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public AuthResponseDTO login(LoginRequestDTO dto) {
+    public void login(LoginRequestDTO dto, HttpServletResponse response) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
@@ -46,10 +48,26 @@ public class AuthService {
 
             String email = authentication.getName();
             String token = jwtUtil.generateToken(email);
-            return new AuthResponseDTO(token);
+
+            Cookie cookie = new Cookie("token", token);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(false); // set to true when ready for deployment (requires https)
+            cookie.setPath("/");
+            cookie.setMaxAge(86400); // 24 hours
+            response.addCookie(cookie);
+
         } catch (AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password.");
         }
+    }
+
+    public void logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("token", "");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); // set to true when ready for deployment (requires https)
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // immediately expire the cookie
+        response.addCookie(cookie);
     }
 
     public void forgotPassword(String email) {
