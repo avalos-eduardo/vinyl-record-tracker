@@ -28,6 +28,11 @@ public class UserController {
         return userService.getUserById(id);
     }
 
+    @GetMapping("/me")
+    public UserResponseDTO getCurrentUser() {
+        return userService.getCurrentUser();
+    }
+
     @PostMapping
     public UserResponseDTO createUser(@RequestBody UserRequestDTO dto) {
         return userService.createUser(dto);

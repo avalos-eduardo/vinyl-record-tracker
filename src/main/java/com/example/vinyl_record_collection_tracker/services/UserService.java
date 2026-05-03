@@ -48,6 +48,11 @@ public class UserService {
         return toDTO(user);
     }
 
+    public UserResponseDTO getCurrentUser() {
+        User currentUser = authUtil.getCurrentUser();
+        return toDTO(currentUser);
+    }
+
     public UserResponseDTO createUser(UserRequestDTO dto) {
         if (userRepository.findByEmail(dto.getEmail()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "An account with this email already exists.");
