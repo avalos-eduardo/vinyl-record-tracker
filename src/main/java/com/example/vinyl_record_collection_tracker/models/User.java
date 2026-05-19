@@ -24,7 +24,7 @@ public class User implements UserDetails {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Vinyl> vinyls;
+    private List<UserVinyl> userVinyls;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -40,8 +40,8 @@ public class User implements UserDetails {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public List<Vinyl> getVinyls() { return vinyls; }
-    public void setVinyls(List<Vinyl> vinyls) { this.vinyls = vinyls; }
+    public List<UserVinyl> getUserVinyls() { return userVinyls; }
+    public void setVinyls(List<UserVinyl> vinyls) { this.userVinyls = userVinyls; }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
