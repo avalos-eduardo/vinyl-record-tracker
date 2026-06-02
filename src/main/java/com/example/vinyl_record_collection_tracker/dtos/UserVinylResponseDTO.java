@@ -18,4 +18,44 @@ public class UserVinylResponseDTO {
         this.addedAt = addedAt;
         this.release = release;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public VinylCondition getCondition() {
+        return condition;
+    }
+
+    public void setCondition(VinylCondition condition) {
+        this.condition = condition;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public LocalDateTime getAddedAt() {
+        return addedAt;
+    }
+
+    public void setAddedAt(LocalDateTime addedAt) {
+        this.addedAt = addedAt;
+    }
+
+    public DiscogsReleaseResponseDTO getRelease() {
+        return release;
+    }
+
+    public void setRelease(DiscogsReleaseResponseDTO release) {
+        this.release = release;
+    }
 }
