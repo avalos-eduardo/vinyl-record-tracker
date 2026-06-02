@@ -10,7 +10,7 @@ public class AppConfig {
     @Value("${discogs.token}")
     private String discogsToken;
 
-    @Value("{discogs.base-url}")
+    @Value("${discogs.base-url}")
     private String baseUrl;
 
     @Bean
