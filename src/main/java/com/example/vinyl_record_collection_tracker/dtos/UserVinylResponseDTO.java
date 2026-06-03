@@ -1,6 +1,7 @@
 package com.example.vinyl_record_collection_tracker.dtos;
 
 import com.example.vinyl_record_collection_tracker.models.VinylCondition;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 
@@ -8,6 +9,7 @@ public class UserVinylResponseDTO {
     private Long id;
     private VinylCondition condition;
     private String notes;
+    @JsonFormat(pattern = "MM/dd/yyyy")
     private LocalDateTime addedAt;
     private DiscogsReleaseResponseDTO release;
 
