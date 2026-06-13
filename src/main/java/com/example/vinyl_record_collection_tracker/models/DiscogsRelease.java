@@ -14,6 +14,10 @@ public class DiscogsRelease {
     @Column(unique = true, nullable = true)
     private String discogsId;
 
+    @ManyToOne
+    @JoinColumn(name = "discogs_master_id")
+    private DiscogsMaster master;
+
     private String title;
     private String artist;
     private String label;
@@ -23,11 +27,35 @@ public class DiscogsRelease {
     private String imageUrl;
     private LocalDateTime lastSyncedAt;
 
+    private String vinylColor;
+
+    @ElementCollection
+    @CollectionTable(name = "discogs_release_format_descriptions")
+    private List<String> formatDescriptions;
+
+    private String barcode;
+
     @OneToMany(mappedBy = "discogsRelease", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserVinyl> userVinyls;
 
     @OneToMany(mappedBy = "discogsRelease", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PriceHistory> priceHistories;
+
+    public String getVinylColor() { return vinylColor; }
+
+    public void setVinylColor(String vinylColor) { this.vinylColor = vinylColor; }
+
+    public List<String> getFormatDescriptions() { return formatDescriptions; }
+
+    public void setFormatDescriptions(List<String> formatDescriptions) { this.formatDescriptions = formatDescriptions; }
+
+    public String getBarcode() { return barcode; }
+
+    public void setBarcode(String barcode) { this.barcode = barcode; }
+
+    public DiscogsMaster getMaster() { return master; }
+
+    public void setMaster(DiscogsMaster master)  { this.master = master; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

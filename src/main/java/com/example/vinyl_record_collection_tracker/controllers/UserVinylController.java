@@ -1,5 +1,6 @@
 package com.example.vinyl_record_collection_tracker.controllers;
 
+import com.example.vinyl_record_collection_tracker.dtos.DiscogsMasterResponseDTO;
 import com.example.vinyl_record_collection_tracker.dtos.PriceHistoryResponseDTO;
 import com.example.vinyl_record_collection_tracker.dtos.UserVinylRequestDTO;
 import com.example.vinyl_record_collection_tracker.dtos.UserVinylResponseDTO;
@@ -28,8 +29,19 @@ public class UserVinylController {
         return userVinylService.getCurrentUserCollection();
     }
 
-    @GetMapping("/{id}")
-    public UserVinylResponseDTO getUserVinyl(@PathVariable Long id) {
+    @GetMapping("/masters")
+    public List<DiscogsMasterResponseDTO> getMasters() {
+        return userVinylService.getCurrentUserMasters();
+    }
+
+    @GetMapping("/masters/{masterId}/releases")
+    public List<UserVinylResponseDTO> getReleasesForMaster(@PathVariable Long masterId) {
+        return userVinylService.getReleasesForMaster(masterId);
+    }
+
+    @GetMapping("/masters/{masterId}/releases/{id}")
+    public UserVinylResponseDTO getUserVinyl(@PathVariable Long masterId,
+                                             @PathVariable Long id) {
         return userVinylService.getUserVinylById(id);
     }
 
@@ -37,12 +49,6 @@ public class UserVinylController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserVinylResponseDTO addVinyl(@RequestBody UserVinylRequestDTO dto) {
         return userVinylService.addVinyl(dto);
-    }
-
-    @PostMapping("/{id}/refresh-price")
-    public PriceHistoryResponseDTO refreshPrice(@PathVariable Long id) {
-        Long discogsReleaseId = userVinylService.getDiscogsReleaseIdForUserVinyl(id);
-        return priceHistoryService.refreshPrice(discogsReleaseId);
     }
 
     @PutMapping("/{id}")
@@ -55,5 +61,11 @@ public class UserVinylController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUserVinyl(@PathVariable Long id) {
         userVinylService.deleteUserVinyl(id);
+    }
+
+    @PostMapping("/{id}/refresh-price")
+    public PriceHistoryResponseDTO refreshPrice(@PathVariable Long id) {
+        Long discogsReleaseId = userVinylService.getDiscogsReleaseIdForUserVinyl(id);
+        return priceHistoryService.refreshPrice(discogsReleaseId);
     }
 }

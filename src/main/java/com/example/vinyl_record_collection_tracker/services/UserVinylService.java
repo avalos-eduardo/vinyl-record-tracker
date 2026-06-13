@@ -1,8 +1,10 @@
 package com.example.vinyl_record_collection_tracker.services;
 
+import com.example.vinyl_record_collection_tracker.dtos.DiscogsMasterResponseDTO;
 import com.example.vinyl_record_collection_tracker.dtos.DiscogsReleaseResponseDTO;
 import com.example.vinyl_record_collection_tracker.dtos.UserVinylRequestDTO;
 import com.example.vinyl_record_collection_tracker.dtos.UserVinylResponseDTO;
+import com.example.vinyl_record_collection_tracker.models.DiscogsMaster;
 import com.example.vinyl_record_collection_tracker.models.DiscogsRelease;
 import com.example.vinyl_record_collection_tracker.models.User;
 import com.example.vinyl_record_collection_tracker.models.UserVinyl;
@@ -14,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserVinylService {
@@ -41,7 +44,10 @@ public class UserVinylService {
                 release.getFormat(),
                 release.getReleaseYear(),
                 release.getImageUrl(),
-                release.getLastSyncedAt()
+                release.getLastSyncedAt(),
+                release.getVinylColor(),
+                release.getFormatDescriptions(),
+                release.getBarcode()
         );
     }
 
@@ -152,5 +158,34 @@ public class UserVinylService {
         }
 
         userVinylRepository.delete(userVinyl);
+    }
+
+    public List<DiscogsMasterResponseDTO> getCurrentUserMasters() {
+        User currentUser = authUtil.getCurrentUser();
+        List<UserVinyl> vinyls = userVinylRepository.findByUserId(currentUser.getId());
+
+        return vinyls.stream()
+                .collect(Collectors.groupingBy(v -> v.getDiscogsRelease().getMaster().getId()))
+                .values().stream()
+                .map(group -> {
+                    DiscogsMaster master = group.get(0).getDiscogsRelease().getMaster();
+                    return new DiscogsMasterResponseDTO(
+                            master.getId(),
+                            master.getMasterId(),
+                            master.getTitle(),
+                            master.getArtist(),
+                            master.getImageUrl(),
+                            group.size()
+                    );
+                })
+                .toList();
+    }
+
+    public List<UserVinylResponseDTO> getReleasesForMaster(Long masterId) {
+        User currentUser = authUtil.getCurrentUser();
+        return userVinylRepository.findByUserId(currentUser.getId()).stream()
+                .filter(v -> v.getDiscogsRelease().getMaster().getId().equals(masterId))
+                .map(this::toDTO)
+                .toList();
     }
 }
