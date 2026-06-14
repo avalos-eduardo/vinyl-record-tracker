@@ -22,8 +22,8 @@ public class DiscogsController {
     }
 
     @GetMapping("/search")
-    public List<DiscogsSearchResultDTO> search(@RequestParam String query) {
-        return discogsService.search(query);
+    public List<DiscogsSearchResultDTO> search(@RequestParam String query, @RequestParam(defaultValue = "1") int page) {
+        return discogsService.search(query, page);
     }
 
     @GetMapping("/prices/{discogsReleaseId}")

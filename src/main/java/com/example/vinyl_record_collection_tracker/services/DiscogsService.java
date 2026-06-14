@@ -31,7 +31,7 @@ public class DiscogsService {
     }
 
     // Search Discogs for releases matching a query — unchanged
-    public List<DiscogsSearchResultDTO> search(String query) {
+    public List<DiscogsSearchResultDTO> search(String query, int page) {
         Map<String, Object> body = discogsWebClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/database/search")
@@ -39,6 +39,7 @@ public class DiscogsService {
                         .queryParam("type", "release")
                         .queryParam("format", "vinyl")
                         .queryParam("per_page", 10)
+                        .queryParam("page", page)
                         .build())
                 .retrieve()
                 .bodyToMono(Map.class)
