@@ -24,6 +24,12 @@ public class UserVinyl {
     private String notes;
 
     private LocalDateTime addedAt;
+    @Column(nullable = false)
+    private boolean wishlist = false;
+
+    public boolean isWishlist() { return wishlist; }
+
+    public void setWishlist(boolean wishlist) { this.wishlist = wishlist; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

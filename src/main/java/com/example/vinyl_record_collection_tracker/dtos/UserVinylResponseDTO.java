@@ -11,15 +11,21 @@ public class UserVinylResponseDTO {
     private String notes;
     @JsonFormat(pattern = "MM/dd/yyyy")
     private LocalDateTime addedAt;
+    private boolean wishlist;
     private DiscogsReleaseResponseDTO release;
 
-    public UserVinylResponseDTO(Long id, VinylCondition condition, String notes, LocalDateTime addedAt, DiscogsReleaseResponseDTO release) {
+    public UserVinylResponseDTO(Long id, VinylCondition condition, String notes, LocalDateTime addedAt, boolean wishlist, DiscogsReleaseResponseDTO release) {
         this.id = id;
         this.condition = condition;
         this.notes = notes;
         this.addedAt = addedAt;
+        this.wishlist = wishlist;
         this.release = release;
     }
+
+    public boolean isWishlist() { return wishlist; }
+
+    public void setWishlist(boolean wishlist) { this.wishlist = wishlist; }
 
     public Long getId() {
         return id;

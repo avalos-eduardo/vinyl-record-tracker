@@ -4,10 +4,7 @@ import com.example.vinyl_record_collection_tracker.dtos.DiscogsMasterResponseDTO
 import com.example.vinyl_record_collection_tracker.dtos.DiscogsReleaseResponseDTO;
 import com.example.vinyl_record_collection_tracker.dtos.UserVinylRequestDTO;
 import com.example.vinyl_record_collection_tracker.dtos.UserVinylResponseDTO;
-import com.example.vinyl_record_collection_tracker.models.DiscogsMaster;
-import com.example.vinyl_record_collection_tracker.models.DiscogsRelease;
-import com.example.vinyl_record_collection_tracker.models.User;
-import com.example.vinyl_record_collection_tracker.models.UserVinyl;
+import com.example.vinyl_record_collection_tracker.models.*;
 import com.example.vinyl_record_collection_tracker.repositories.UserVinylRepository;
 import com.example.vinyl_record_collection_tracker.security.AuthUtil;
 import org.springframework.http.HttpStatus;
@@ -57,14 +54,45 @@ public class UserVinylService {
                 userVinyl.getCondition(),
                 userVinyl.getNotes(),
                 userVinyl.getAddedAt(),
+                userVinyl.isWishlist(),
                 toReleaseDTO(userVinyl.getDiscogsRelease())
         );
     }
 
+    // -- Collection methods --
     public List<UserVinylResponseDTO> getCurrentUserCollection() {
         User currentUser = authUtil.getCurrentUser();
-        return userVinylRepository.findByUserId(currentUser.getId())
+        return userVinylRepository.findByUserIdAndWishlistFalse(currentUser.getId())
                 .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    public List<DiscogsMasterResponseDTO> getCurrentUserMasters() {
+        User currentUser = authUtil.getCurrentUser();
+        List<UserVinyl> vinyls = userVinylRepository.findByUserIdAndWishlistFalse(currentUser.getId());
+
+        return vinyls.stream()
+                .collect(Collectors.groupingBy(v -> v.getDiscogsRelease().getMaster().getId()))
+                .values().stream()
+                .map(group -> {
+                    DiscogsMaster master = group.get(0).getDiscogsRelease().getMaster();
+                    return new DiscogsMasterResponseDTO(
+                            master.getId(),
+                            master.getMasterId(),
+                            master.getTitle(),
+                            master.getArtist(),
+                            master.getImageUrl(),
+                            group.size()
+                    );
+                })
+                .toList();
+    }
+
+    public List<UserVinylResponseDTO> getReleasesForMaster(Long masterId) {
+        User currentUser = authUtil.getCurrentUser();
+        return userVinylRepository.findByUserIdAndWishlistFalse(currentUser.getId()).stream()
+                .filter(v -> v.getDiscogsRelease().getMaster().getId().equals(masterId))
                 .map(this::toDTO)
                 .toList();
     }
@@ -81,6 +109,60 @@ public class UserVinylService {
         return toDTO(userVinyl);
     }
 
+    // -- Wishlist methods --
+    public List<DiscogsMasterResponseDTO> getCurrentUserWishlistMasters() {
+        User currentUser = authUtil.getCurrentUser();
+        List<UserVinyl> vinyls = userVinylRepository
+                .findByUserIdAndWishlistTrue(currentUser.getId());
+
+        return vinyls.stream()
+                .collect(Collectors.groupingBy(v -> v.getDiscogsRelease().getMaster().getId()))
+                .values().stream()
+                .map(group -> {
+                    DiscogsMaster master = group.get(0).getDiscogsRelease().getMaster();
+                    return new DiscogsMasterResponseDTO(
+                            master.getId(),
+                            master.getMasterId(),
+                            master.getTitle(),
+                            master.getArtist(),
+                            master.getImageUrl(),
+                            group.size()
+                    );
+                })
+                .toList();
+    }
+
+    public List<UserVinylResponseDTO> getWishlistReleasesForMaster(Long masterId) {
+        User currentUser = authUtil.getCurrentUser();
+        return userVinylRepository.findByUserIdAndWishlistTrue(currentUser.getId()).stream()
+                .filter(v -> v.getDiscogsRelease().getMaster().getId().equals(masterId))
+                .map(this::toDTO)
+                .toList();
+    }
+
+    public UserVinylResponseDTO moveToCollection(Long id, VinylCondition condition) {
+        User currentUser = authUtil.getCurrentUser();
+        UserVinyl userVinyl = userVinylRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vinyl not found."));
+
+        if (!userVinyl.getUser().getId().equals(currentUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only modify your own vinyls.");
+        }
+
+        // Check user doesn't already own this release in their collection
+        if (userVinylRepository.existsByUserIdAndDiscogsReleaseIdAndWishlistFalse(
+                currentUser.getId(), userVinyl.getDiscogsRelease().getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "This release is already in your collection.");
+        }
+
+        userVinyl.setWishlist(false);
+        userVinyl.setCondition(condition);
+        userVinyl.setAddedAt(LocalDateTime.now());
+        return toDTO(userVinylRepository.save(userVinyl));
+    }
+
+    // -- Shared methods --
     public Long getDiscogsReleaseIdForUserVinyl(Long userVinylId) {
         User currentUser = authUtil.getCurrentUser();
         UserVinyl userVinyl = userVinylRepository.findById(userVinylId)
@@ -100,18 +182,25 @@ public class UserVinylService {
         DiscogsRelease release;
 
         if (dto.getDiscogsId() != null) {
-            // Discogs-backed entry — fetch or reuse from local DB
             release = discogsService.fetchAndSaveRelease(dto.getDiscogsId());
-
             if (release == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Release not found on Discogs.");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Release not found on Discogs.");
             }
-
-            // Check if user already has this release in their collection
-            if (userVinylRepository.existsByUserIdAndDiscogsReleaseId(currentUser.getId(), release.getId())) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "This release is already in your collection.");
+            // Check for duplicates within the same context (collection or wishlist)
+            if (dto.isWishlist()) {
+                if (userVinylRepository.existsByUserIdAndDiscogsReleaseIdAndWishlistTrue(
+                        currentUser.getId(), release.getId())) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT,
+                            "This release is already in your wishlist.");
+                }
+            } else {
+                if (userVinylRepository.existsByUserIdAndDiscogsReleaseIdAndWishlistFalse(
+                        currentUser.getId(), release.getId())) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT,
+                            "This release is already in your collection.");
+                }
             }
-
         } else {
             // Manual entry — validate required fields
             if (dto.getTitle() == null || dto.getArtist() == null) {
@@ -126,6 +215,7 @@ public class UserVinylService {
         userVinyl.setDiscogsRelease(release);
         userVinyl.setCondition(dto.getCondition());
         userVinyl.setNotes(dto.getNotes());
+        userVinyl.setWishlist(dto.isWishlist());
         userVinyl.setAddedAt(LocalDateTime.now());
 
         return toDTO(userVinylRepository.save(userVinyl));
@@ -158,34 +248,5 @@ public class UserVinylService {
         }
 
         userVinylRepository.delete(userVinyl);
-    }
-
-    public List<DiscogsMasterResponseDTO> getCurrentUserMasters() {
-        User currentUser = authUtil.getCurrentUser();
-        List<UserVinyl> vinyls = userVinylRepository.findByUserId(currentUser.getId());
-
-        return vinyls.stream()
-                .collect(Collectors.groupingBy(v -> v.getDiscogsRelease().getMaster().getId()))
-                .values().stream()
-                .map(group -> {
-                    DiscogsMaster master = group.get(0).getDiscogsRelease().getMaster();
-                    return new DiscogsMasterResponseDTO(
-                            master.getId(),
-                            master.getMasterId(),
-                            master.getTitle(),
-                            master.getArtist(),
-                            master.getImageUrl(),
-                            group.size()
-                    );
-                })
-                .toList();
-    }
-
-    public List<UserVinylResponseDTO> getReleasesForMaster(Long masterId) {
-        User currentUser = authUtil.getCurrentUser();
-        return userVinylRepository.findByUserId(currentUser.getId()).stream()
-                .filter(v -> v.getDiscogsRelease().getMaster().getId().equals(masterId))
-                .map(this::toDTO)
-                .toList();
     }
 }

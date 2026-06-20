@@ -9,6 +9,13 @@ public class UserVinylRequestDTO {
     private Integer releaseYear;   // used for manual entry
     private VinylCondition condition;
     private String notes;
+    private boolean wishlist = false;
+
+    public boolean isWishlist() { return wishlist; }
+
+    public void setWishlist(boolean wishlist) {
+        this.wishlist = wishlist;
+    }
 
     public String getDiscogsId() { return discogsId; }
     public void setDiscogsId(String discogsId) { this.discogsId = discogsId; }
