@@ -194,6 +194,9 @@ public class UserVinylService {
                     throw new ResponseStatusException(HttpStatus.CONFLICT,
                             "This release is already in your wishlist.");
                 }
+                if (userVinylRepository.existsByUserIdAndDiscogsReleaseIdAndWishlistFalse(currentUser.getId(), release.getId())) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "You already own this release.");
+                }
             } else {
                 if (userVinylRepository.existsByUserIdAndDiscogsReleaseIdAndWishlistFalse(
                         currentUser.getId(), release.getId())) {
