@@ -4,6 +4,7 @@ import com.example.vinyl_record_collection_tracker.dtos.DiscogsMasterResponseDTO
 import com.example.vinyl_record_collection_tracker.dtos.DiscogsReleaseResponseDTO;
 import com.example.vinyl_record_collection_tracker.dtos.UserVinylRequestDTO;
 import com.example.vinyl_record_collection_tracker.dtos.UserVinylResponseDTO;
+import com.example.vinyl_record_collection_tracker.exceptions.DemoAccountRestrictedException;
 import com.example.vinyl_record_collection_tracker.models.*;
 import com.example.vinyl_record_collection_tracker.repositories.UserVinylRepository;
 import com.example.vinyl_record_collection_tracker.security.AuthUtil;
@@ -57,6 +58,12 @@ public class UserVinylService {
                 userVinyl.isWishlist(),
                 toReleaseDTO(userVinyl.getDiscogsRelease())
         );
+    }
+
+    private void assertNotDemo(User user) {
+        if (user.isDemo()) {
+            throw new DemoAccountRestrictedException();
+        }
     }
 
     // -- Collection methods --
@@ -142,6 +149,7 @@ public class UserVinylService {
 
     public UserVinylResponseDTO moveToCollection(Long id, VinylCondition condition) {
         User currentUser = authUtil.getCurrentUser();
+        assertNotDemo(currentUser);
         UserVinyl userVinyl = userVinylRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vinyl not found."));
 
@@ -177,6 +185,7 @@ public class UserVinylService {
 
     public UserVinylResponseDTO addVinyl(UserVinylRequestDTO dto) {
         User currentUser = authUtil.getCurrentUser();
+        assertNotDemo(currentUser);
 
         // Step 1: Get or create the DiscogsRelease
         DiscogsRelease release;
@@ -226,6 +235,7 @@ public class UserVinylService {
 
     public UserVinylResponseDTO updateUserVinyl(Long id, UserVinylRequestDTO dto) {
         User currentUser = authUtil.getCurrentUser();
+        assertNotDemo(currentUser);
         UserVinyl userVinyl = userVinylRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vinyl not found."));
 
@@ -243,6 +253,7 @@ public class UserVinylService {
 
     public void deleteUserVinyl(Long id) {
         User currentUser = authUtil.getCurrentUser();
+        assertNotDemo(currentUser);
         UserVinyl userVinyl = userVinylRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vinyl not found."));
 

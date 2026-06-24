@@ -21,10 +21,15 @@ public class User implements UserDetails {
     private String email;
     @JsonIgnore
     private String password;
+    @Column(nullable = false)
+    private boolean isDemo = false;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserVinyl> userVinyls;
+
+    public boolean isDemo() { return isDemo; }
+    public void setDemo(boolean demo) { isDemo = demo; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
