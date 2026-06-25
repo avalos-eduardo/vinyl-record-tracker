@@ -22,9 +22,10 @@ public class DiscogsReleaseResponseDTO {
     @CollectionTable(name = "discogs_release_format_descriptions")
     private List<String> formatDescriptions;
     private String barcode;
+    private String country;
 
 
-    public DiscogsReleaseResponseDTO(Long id, String discogsId, String title, String artist, String label, String genre, String format, Integer releaseYear, String imageUrl, LocalDateTime lastSyncedAt, String vinylColor, List<String> formatDescriptions, String barcode) {
+    public DiscogsReleaseResponseDTO(Long id, String discogsId, String title, String artist, String label, String genre, String format, Integer releaseYear, String imageUrl, LocalDateTime lastSyncedAt, String vinylColor, List<String> formatDescriptions, String barcode, String country) {
         this.id = id;
         this.discogsId = discogsId;
         this.title = title;
@@ -38,8 +39,10 @@ public class DiscogsReleaseResponseDTO {
         this.vinylColor = vinylColor;
         this.formatDescriptions = formatDescriptions;
         this.barcode = barcode;
+        this.country = country;
     }
 
+    public String getCountry() { return country; }
     public String getBarcode() { return barcode; }
 
     public void setBarcode(String barcode) { this.barcode = barcode; }
@@ -51,7 +54,6 @@ public class DiscogsReleaseResponseDTO {
     public String getVinylColor() { return vinylColor; }
 
     public void setVinylColor(String vinylColor) { this.vinylColor = vinylColor; }
-
     public Long getId() { return id; }
     public String getDiscogsId() { return discogsId; }
     public String getTitle() { return title; }

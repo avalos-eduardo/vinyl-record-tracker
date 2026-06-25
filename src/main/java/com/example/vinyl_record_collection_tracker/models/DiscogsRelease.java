@@ -41,6 +41,12 @@ public class DiscogsRelease {
     @OneToMany(mappedBy = "discogsRelease", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PriceHistory> priceHistories;
 
+    private String country;
+
+    public String getCountry() { return country; }
+
+    public void setCountry(String country) { this.country = country; }
+
     public String getVinylColor() { return vinylColor; }
 
     public void setVinylColor(String vinylColor) { this.vinylColor = vinylColor; }

@@ -45,7 +45,8 @@ public class UserVinylService {
                 release.getLastSyncedAt(),
                 release.getVinylColor(),
                 release.getFormatDescriptions(),
-                release.getBarcode()
+                release.getBarcode(),
+                release.getCountry()
         );
     }
 

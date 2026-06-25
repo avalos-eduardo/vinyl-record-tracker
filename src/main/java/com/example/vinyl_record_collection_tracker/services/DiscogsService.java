@@ -96,6 +96,8 @@ public class DiscogsService {
                 formatDescriptions = (List<String>) primaryFormat.getOrDefault("descriptions", List.of());
             }
 
+            String country = (String) result.getOrDefault("country", null);
+
             results.add(new DiscogsSearchResultDTO(
                     discogsId,
                     releaseTitle,
@@ -106,7 +108,8 @@ public class DiscogsService {
                     releaseYear,
                     imageUrl,
                     vinylColor,
-                    formatDescriptions
+                    formatDescriptions,
+                    country
             ));
         }
 
@@ -171,6 +174,8 @@ public class DiscogsService {
         // barcode extraction
         List<Map<String, Object>> identifiers = (List<Map<String, Object>>) body.getOrDefault("identifiers", List.of());
         release.setBarcode(extractBarcode(identifiers));
+
+        release.setCountry((String) body.getOrDefault("country", null));
 
         release.setLastSyncedAt(LocalDateTime.now());
 

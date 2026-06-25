@@ -13,9 +13,10 @@ public class DiscogsSearchResultDTO {
     private String imageUrl;
     private String vinylColor;
     private List<String> formatDescriptions;
+    private String country;
 
 
-    public DiscogsSearchResultDTO(String discogsId, String title, String artist, String label, String genre, String format, Integer releaseYear, String imageUrl, String vinylColor, List<String> formatDescriptions) {
+    public DiscogsSearchResultDTO(String discogsId, String title, String artist, String label, String genre, String format, Integer releaseYear, String imageUrl, String vinylColor, List<String> formatDescriptions, String country) {
         this.discogsId = discogsId;
         this.title = title;
         this.artist = artist;
@@ -26,6 +27,7 @@ public class DiscogsSearchResultDTO {
         this.imageUrl = imageUrl;
         this.vinylColor = vinylColor;
         this.formatDescriptions = formatDescriptions;
+        this.country = country;
     }
 
     public String getDiscogsId() { return discogsId; }
@@ -36,12 +38,10 @@ public class DiscogsSearchResultDTO {
     public String getFormat() { return format; }
     public Integer getReleaseYear() { return releaseYear; }
     public String getImageUrl() { return imageUrl; }
-
     public List<String> getFormatDescriptions() { return formatDescriptions; }
-
     public void setFormatDescriptions(List<String> formatDescriptions) { this.formatDescriptions = formatDescriptions; }
-
     public String getVinylColor() { return vinylColor; }
-
     public void setVinylColor(String vinylColor) { this.vinylColor = vinylColor; }
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
 }
