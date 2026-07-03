@@ -38,9 +38,6 @@ public class DiscogsRelease {
     @OneToMany(mappedBy = "discogsRelease", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserVinyl> userVinyls;
 
-    @OneToMany(mappedBy = "discogsRelease", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PriceHistory> priceHistories;
-
     private String country;
 
     public String getCountry() { return country; }
@@ -95,7 +92,4 @@ public class DiscogsRelease {
 
     public List<UserVinyl> getUserVinyls() { return userVinyls; }
     public void setUserVinyls(List<UserVinyl> userVinyls) { this.userVinyls = userVinyls; }
-
-    public List<PriceHistory> getPriceHistories() { return priceHistories; }
-    public void setPriceHistories(List<PriceHistory> priceHistories) { this.priceHistories = priceHistories; }
 }

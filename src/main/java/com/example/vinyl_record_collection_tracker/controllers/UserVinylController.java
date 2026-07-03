@@ -1,10 +1,8 @@
 package com.example.vinyl_record_collection_tracker.controllers;
 
 import com.example.vinyl_record_collection_tracker.dtos.DiscogsMasterResponseDTO;
-import com.example.vinyl_record_collection_tracker.dtos.PriceHistoryResponseDTO;
 import com.example.vinyl_record_collection_tracker.dtos.UserVinylRequestDTO;
 import com.example.vinyl_record_collection_tracker.dtos.UserVinylResponseDTO;
-import com.example.vinyl_record_collection_tracker.services.PriceHistoryService;
 import com.example.vinyl_record_collection_tracker.services.UserVinylService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +14,9 @@ import java.util.List;
 public class UserVinylController {
 
     private final UserVinylService userVinylService;
-    private final PriceHistoryService priceHistoryService;
 
-    public UserVinylController(UserVinylService userVinylService,
-                               PriceHistoryService priceHistoryService) {
+    public UserVinylController(UserVinylService userVinylService) {
         this.userVinylService = userVinylService;
-        this.priceHistoryService = priceHistoryService;
     }
 
     @GetMapping
@@ -61,11 +56,5 @@ public class UserVinylController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUserVinyl(@PathVariable Long id) {
         userVinylService.deleteUserVinyl(id);
-    }
-
-    @PostMapping("/{id}/refresh-price")
-    public PriceHistoryResponseDTO refreshPrice(@PathVariable Long id) {
-        Long discogsReleaseId = userVinylService.getDiscogsReleaseIdForUserVinyl(id);
-        return priceHistoryService.refreshPrice(discogsReleaseId);
     }
 }

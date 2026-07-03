@@ -172,18 +172,6 @@ public class UserVinylService {
     }
 
     // -- Shared methods --
-    public Long getDiscogsReleaseIdForUserVinyl(Long userVinylId) {
-        User currentUser = authUtil.getCurrentUser();
-        UserVinyl userVinyl = userVinylRepository.findById(userVinylId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vinyl not found."));
-
-        if (!userVinyl.getUser().getId().equals(currentUser.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only refresh prices for your own vinyls.");
-        }
-
-        return userVinyl.getDiscogsRelease().getId();
-    }
-
     public UserVinylResponseDTO addVinyl(UserVinylRequestDTO dto) {
         User currentUser = authUtil.getCurrentUser();
         assertNotDemo(currentUser);

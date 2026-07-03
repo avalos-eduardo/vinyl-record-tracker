@@ -260,19 +260,6 @@ public class DiscogsService {
                 });
     }
 
-    // Fetch price statistics for a specific release — unchanged
-    public Map<String, Object> fetchPriceStatistics(String discogsId) {
-        try {
-            return discogsWebClient.get()
-                    .uri("/marketplace/stats/" + discogsId)
-                    .retrieve()
-                    .bodyToMono(Map.class)
-                    .block();
-        } catch (WebClientResponseException e) {
-            return null;
-        }
-    }
-
     // Create a manual DiscogsRelease with no Discogs ID — updated to attach pseudo-master
     public DiscogsRelease createManualRelease(String title, String artist, Integer releaseYear) {
         DiscogsRelease release = new DiscogsRelease();
