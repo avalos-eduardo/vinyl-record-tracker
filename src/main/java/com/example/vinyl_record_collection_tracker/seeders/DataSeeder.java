@@ -1,8 +1,6 @@
 package com.example.vinyl_record_collection_tracker.seeders;
 
 import com.example.vinyl_record_collection_tracker.models.*;
-import com.example.vinyl_record_collection_tracker.repositories.DiscogsMasterRepository;
-import com.example.vinyl_record_collection_tracker.repositories.DiscogsReleaseRepository;
 import com.example.vinyl_record_collection_tracker.repositories.UserRepository;
 import com.example.vinyl_record_collection_tracker.repositories.UserVinylRepository;
 import com.example.vinyl_record_collection_tracker.services.DiscogsService;
@@ -12,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 public class DataSeeder implements ApplicationRunner {
@@ -67,21 +66,23 @@ public class DataSeeder implements ApplicationRunner {
             demo.setDemo(true);
             userRepository.save(demo);
         } else if (!demo.isDemo()) {
-            // backfill flag if this user existed before the column was added
             demo.setDemo(true);
             userRepository.save(demo);
-        } else {
-            userVinylRepository.deleteAll(userVinylRepository.findByUserId(demo.getId()));
         }
 
-        for (int i = 0; i < COLLECTION_DISCOGS_IDS.length; i++) {
-            seedVinyl(demo, COLLECTION_DISCOGS_IDS[i], COLLECTION_CONDITIONS[i], false);
-        }
-        for (String discogsId : WISHLIST_DISCOGS_IDS) {
-            seedVinyl(demo, discogsId, VinylCondition.MINT, true);
-        }
+        List<UserVinyl> collection = userVinylRepository
+                .findByUserId(demo.getId());
 
-        System.out.println("Demo user and vinyls seeded successfully.");
+        if (collection.isEmpty()) {
+            for (int i = 0; i < COLLECTION_DISCOGS_IDS.length; i++) {
+                seedVinyl(demo, COLLECTION_DISCOGS_IDS[i], COLLECTION_CONDITIONS[i], false);
+            }
+            for (String discogsId : WISHLIST_DISCOGS_IDS) {
+                seedVinyl(demo, discogsId, VinylCondition.MINT, true);
+            }
+
+            System.out.println("Demo user and vinyls seeded successfully.");
+        }
     }
 
     private void seedVinyl(User user, String discogsId, VinylCondition condition, boolean wishlist) {
