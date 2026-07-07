@@ -53,6 +53,7 @@ public class AuthService {
             cookie.setSecure(true);
             cookie.setPath("/");
             cookie.setMaxAge(86400); // 24 hours
+            cookie.setAttribute("SameSite", "None");
             response.addCookie(cookie);
 
         } catch (AuthenticationException e) {
@@ -66,6 +67,7 @@ public class AuthService {
         cookie.setSecure(true); // set to true when ready for deployment (requires https)
         cookie.setPath("/");
         cookie.setMaxAge(0); // immediately expire the cookie
+        cookie.setAttribute("SameSite", "None");
         response.addCookie(cookie);
     }
 
