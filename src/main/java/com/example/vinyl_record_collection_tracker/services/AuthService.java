@@ -1,6 +1,5 @@
 package com.example.vinyl_record_collection_tracker.services;
 
-import com.example.vinyl_record_collection_tracker.dtos.AuthResponseDTO;
 import com.example.vinyl_record_collection_tracker.dtos.LoginRequestDTO;
 import com.example.vinyl_record_collection_tracker.models.PasswordResetToken;
 import com.example.vinyl_record_collection_tracker.models.User;
@@ -51,7 +50,7 @@ public class AuthService {
 
             Cookie cookie = new Cookie("token", token);
             cookie.setHttpOnly(true);
-            cookie.setSecure(false); // set to true when ready for deployment (requires https)
+            cookie.setSecure(true);
             cookie.setPath("/");
             cookie.setMaxAge(86400); // 24 hours
             response.addCookie(cookie);
@@ -64,7 +63,7 @@ public class AuthService {
     public void logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("token", "");
         cookie.setHttpOnly(true);
-        cookie.setSecure(false); // set to true when ready for deployment (requires https)
+        cookie.setSecure(true); // set to true when ready for deployment (requires https)
         cookie.setPath("/");
         cookie.setMaxAge(0); // immediately expire the cookie
         response.addCookie(cookie);
