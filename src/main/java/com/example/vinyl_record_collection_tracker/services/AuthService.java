@@ -6,10 +6,11 @@ import com.example.vinyl_record_collection_tracker.models.User;
 import com.example.vinyl_record_collection_tracker.repositories.PasswordResetTokenRepository;
 import com.example.vinyl_record_collection_tracker.repositories.UserRepository;
 import com.example.vinyl_record_collection_tracker.security.JwtUtil;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -48,13 +50,16 @@ public class AuthService {
             String email = authentication.getName();
             String token = jwtUtil.generateToken(email);
 
-            Cookie cookie = new Cookie("token", token);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(86400); // 24 hours
-            cookie.setAttribute("SameSite", "None");
-            response.addCookie(cookie);
+            ResponseCookie cookie = ResponseCookie.from("token", token)
+                    .httpOnly(true)
+                    .secure(true)
+                    .sameSite("Lax")
+                    .domain("vinyl-record-tracker.com")
+                    .path("/")
+                    .maxAge(Duration.ofHours(24))
+                    .build();
+
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         } catch (AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password.");
@@ -62,13 +67,15 @@ public class AuthService {
     }
 
     public void logout(HttpServletResponse response) {
-        Cookie cookie = new Cookie("token", "");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true); // set to true when ready for deployment (requires https)
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // immediately expire the cookie
-        cookie.setAttribute("SameSite", "None");
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from("token", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
+                .domain("vinyl-record-tracker.com")
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     public void forgotPassword(String email) {
