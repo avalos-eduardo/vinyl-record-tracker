@@ -1,6 +1,7 @@
 package com.example.vinyl_record_collection_tracker.services;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -19,8 +20,8 @@ public class EmailService {
     @Value("${resend.from.address}")
     private String fromAddress;
 
-    public EmailService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder
+    public EmailService() {
+        this.webClient = WebClient.builder()
                 .baseUrl("https://api.resend.com")
                 .build();
     }
@@ -45,7 +46,7 @@ public class EmailService {
             webClient.post()
                     .uri("/emails")
                     .header("Authorization", "Bearer " + resendApiKey)
-                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(payload)
                     .retrieve()
                     .toBodilessEntity()
